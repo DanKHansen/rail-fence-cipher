@@ -1,3 +1,4 @@
 object RailFenceCipher:
-   def encode(s: String, i: Int): String = ???
-   def decode(s: String, i: Int): String = ???
+   def encode(text: String, lines: Int): String = ???
+
+   def decode(text: String, lines: Int): String = ???
