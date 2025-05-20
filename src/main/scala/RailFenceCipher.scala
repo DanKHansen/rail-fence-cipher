@@ -1,11 +1,14 @@
 object RailFenceCipher:
    def encode(text: String, key: Int): String =
-      val ids = (0 until key) ++ (0 until key).reverse.drop(1).init
-      text.sliding(ids.size, ids.size).flatMap(_.zip(ids)).toSeq.groupBy(_._2).values.flatten.map(_._1).mkString
+      rfc(text, key)
 
    def decode(text: String, key: Int): String =
-      val pattern = (1 until key) ++ (key until 1 by -1)
-      val rails = (0 until text.length / key).flatMap(_ => pattern)
-      val zipped = (1 until text.length + 1).zip(rails)
-      val prevIndex = (1 until key + 1).flatMap(r => zipped.filter(t => t._2 == r).map(_._1))
-      prevIndex.zip(text).sorted.map(_._2).mkString
+      rfc(text, key, 'd')
+
+   private def rfc(t: String, k: Int, m: Char = 'e'): String =
+      val p = (0 until k) ++ (k - 2 until 0 by -1)
+      m match
+         case 'e' => t.sliding(p.size, p.size).flatMap(_.zip(p)).toSeq.groupBy(_._2).values.flatten.map(_._1).mkString
+         case 'd' => (0 until k).flatMap(i =>
+                  (0 until t.length).zip(LazyList.continually(p).flatten.take(t.length)).collect
+                     { case (idx, `i`) => idx }).zip(t).sorted.map(_._2).mkString
